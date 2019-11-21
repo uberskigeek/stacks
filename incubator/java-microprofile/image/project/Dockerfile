@@ -6,6 +6,8 @@ RUN apt-get update && \
 
 # Copy and build the dev.appsody:java-microprofile parent pom
 COPY ./pom.xml /project/pom.xml
+COPY ./validate.sh /project/validate.sh
+RUN chmod 750 /project/validate.sh
 RUN cd /project && mvn -B install dependency:go-offline -DskipTests
 
 # Copy and run a simple version check
@@ -17,7 +19,7 @@ COPY ./user-app/pom.xml /project/user-app/pom.xml
 RUN cd /project/user-app && mvn package -Dskip=true -DskipTests
 
 # Download Open Liberty here to prevent redownloading each time the app is changed
-RUN cd /project/user-app && mvn liberty:install-server
+RUN cd /project/user-app && ../validate.sh && mvn liberty:install-server
 
 # Copy and build the application source
 COPY ./user-app/src /project/user-app/src
