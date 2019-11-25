@@ -7,7 +7,6 @@ RUN apt-get update && \
 # Copy and build the dev.appsody:java-microprofile parent pom
 COPY ./pom.xml /project/pom.xml
 COPY ./validate.sh /project/validate.sh
-RUN chmod 750 /project/validate.sh
 RUN cd /project && mvn -B install dependency:go-offline -DskipTests
 
 # Copy and run a simple version check
