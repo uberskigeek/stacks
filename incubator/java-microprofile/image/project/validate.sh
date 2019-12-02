@@ -1,5 +1,22 @@
 #!/bin/bash
 
+
+
+check_for_update() {
+   while read LINE
+    do
+      echo $LINE
+    done < ./.pom.status
+   mtime=`stat -t pom.xml | cut -d " " -f 13`
+   if [ "$LINE" == "$mtime" ]; then
+     return 0
+   else
+     echo $mtime > ./.pom.status
+     return 1
+   fi
+}
+
+
 # Test pom.xml is present and a file.
 if [ ! -f ./pom.xml ]; then
   echo "Error: Could not find Maven pom.xml
@@ -11,6 +28,21 @@ if [ ! -f ./pom.xml ]; then
   "
   exit 1   
 fi
+# have we saved last update time for pom.xml in .pom.status?
+ if [ -f ./.pom.status ]; then
+   #file exists check to see if the dates changed
+   rc=check_for_update
+   if [ $rc > 0 ]; then
+     echo "pom.xml has been updated will run validation"
+   else 
+     #no need to run validate pom.xml hasn't been changed
+     exit 0
+   fi
+ else
+   # First time through. Save pom.xml timestamp for later comparison.
+   mtime=`stat -t pom.xml | cut -d " " -f 13`
+   echo $mtime > ./.pom.status
+ fi
 
 # Get parent pom information (../pom.xml)
 args='export PARENT_GROUP_ID=${project.groupId}; export PARENT_ARTIFACT_ID=${project.artifactId}; export PARENT_VERSION=${project.version}

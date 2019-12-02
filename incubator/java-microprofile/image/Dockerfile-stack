@@ -31,7 +31,8 @@ ENV APPSODY_USER_RUN_AS_LOCAL=true
 
 ENV APPSODY_INSTALL="../validate.sh && mvn -B -Dmaven.repo.local=/mvn/repository install -DskipTests && /project/install-dev-deps.sh"
 
-ENV APPSODY_RUN="JVM_ARGS='-javaagent:resources/javametrics-agent.jar' mvn -B -Dmaven.repo.local=/mvn/repository liberty:dev -DskipTests"
+ENV APPSODY_RUN="JVM_ARGS='-javaagent:resources/javametrics-agent.jar' && ../validate.sh && mvn -B -Dmaven.repo.local=/mvn/repository liberty:dev -DskipTests"
+ENV APPSODY_RUN_ON_CHANGE="JVM_ARGS='-javaagent:resources/javametrics-agent.jar' ../validate.sh"
 ENV APPSODY_RUN_KILL=false
 
 ENV APPSODY_DEBUG="JVM_ARGS='-javaagent:resources/javametrics-agent.jar' mvn -B -Dmaven.repo.local=/mvn/repository liberty:dev -DskipTests"
