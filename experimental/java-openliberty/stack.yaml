@@ -1,0 +1,13 @@
+name: Eclipse MicroProfile®
+version: 0.1.0
+description: Eclipse MicroProfile on Open Liberty & OpenJ9 using Maven
+license: Apache-2.0
+language: java
+maintainers:
+  - name: Mike Andrasak
+    email: andrasak@us.ibm.com
+    github-id: uberskigeek
+  - name: Andy Mauer
+    email: ajmauer@us.ibm.com
+    github-id: ajm01
+default-template: default
