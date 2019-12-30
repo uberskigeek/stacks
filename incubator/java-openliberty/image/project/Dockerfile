@@ -6,6 +6,8 @@ RUN apt-get update && \
 
 # Copy and build the dev.appsody:java-openliberty parent pom
 COPY ./pom.xml /project/pom.xml
+
+
 RUN cd /project && mvn -B install dependency:go-offline -DskipTests
 
 # Copy and run a simple version check
@@ -26,7 +28,7 @@ RUN cd /project/user-app/target/liberty/wlp/usr/servers && \
     mv defaultServer/* /config/
 
 # Step 2: Package Open Liberty image
-FROM open-liberty:kernel-java8-openj9
+FROM open-liberty:{{.stack.liberty_version}}-kernel-java8-openj9
 
 COPY --chown=1001:0 --from=0 /config/ /config/
 COPY --chown=1001:0 --from=0 /project/user-app/target/*.war /config/apps
