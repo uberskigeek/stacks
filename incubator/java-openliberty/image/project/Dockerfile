@@ -1,6 +1,5 @@
 # Step 1: Build the user's application
-FROM adoptopenjdk/openjdk8-openj9
-
+FROM adoptopenjdk/openjdk8-openj9:jre8u242-b08_openj9-0.18.1-ubi
 RUN apt-get update && \
     apt-get install -y maven unzip wget xmlstarlet
 
@@ -40,7 +39,7 @@ RUN cd /project/user-app/target/liberty/wlp/usr/servers && \
     mv defaultServer/* /config/
 
 # Step 2: Package Open Liberty image
-FROM open-liberty:kernel-java8-openj9
+FROM open-liberty:kernel-java8-openj9_ubi:
 
 COPY --chown=1001:0 --from=0 /config/ /config/
 COPY --chown=1001:0 --from=0 /project/user-app/target/*.war /config/apps
