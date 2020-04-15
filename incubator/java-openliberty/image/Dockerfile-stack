@@ -1,27 +1,40 @@
 FROM kabanero/ubi8-maven:0.3.1
-RUN  mkdir -p /mvn/repository \
-  && mkdir -p /opt/ol 
+RUN  useradd --uid 501 --gid 20 --shell /bin/bash --create-home java_user \
+  && mkdir -p /mvn/repository \
+  && chown -R java_user:20 /mvn \
+  && mkdir -p /opt/ol \
+  && chown -R java_user:20 /opt \
+  && mkdir -p /opt/logs \
+  && chown -R java_user:20  /opt/logs \
+  && mkdir -p /opt/user \
+  && chown -R java_user:20 /opt/user  
 
 
 COPY ./LICENSE /licenses/
-COPY ./project /project
-COPY ./config /config
+COPY --chown=java_user:20 ./project /project
+COPY --chown=java_user:20 ./config /config
+
+USER java_user
 
 RUN  /project/util/check_version build
 
 WORKDIR /project/
 
-RUN mkdir -p /mvn/repository && chmod 2777 /mvn/repository
+ENV WLP_USER_DIR=/opt/user
+ENV WLP_OUTPUT_DIR=/opt/logs
+
+RUN mkdir -p /mvn/repository
 RUN mvn -B -Dmaven.repo.local=/mvn/repository -N io.takari:maven:wrapper -Dmaven=$(mvn help:evaluate -Dexpression=maven.version -q -DforceStdout)
 RUN mvn -B -Pstack-image-package -Dmaven.repo.local=/mvn/repository liberty:install-server install dependency:go-offline
-RUN chmod -R 777 /opt/ol 
+RUN chmod -R 755 /opt/ol 
+RUN chmod -R 777 /mvn/repository
 
 WORKDIR /project/user-app
 
 #ENV APPSODY_DEPS=/mvn/repository
 #ENV APPSODY_MOUNTS=".:/project/user-app"
-ENV APPSODY_MOUNTS="~/.m2/repository:/mvn/repository;.:/project/user-app"
 
+ENV APPSODY_MOUNTS="~/.m2/repository:/mvn/repository;.:/project/user-app"
 ENV APPSODY_USER_RUN_AS_LOCAL=true
 
 # Allow validate to distinguish build via APPSODY_DEV_MODE
